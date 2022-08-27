@@ -1,0 +1,1 @@
+xcopy /y bin\Debug\net472\Akips.dll E:\Spt-320\BepInEx\plugins
