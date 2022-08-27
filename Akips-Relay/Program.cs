@@ -36,14 +36,14 @@ namespace Akips_Relay
 
             _http = new Server(config.HttpIp, config.HttpPort, false, DefaultRoute);
             _http.Start();
-            _logger.Info($"Uruchomiono serwer HTTP pod adresem {config.HttpIp}:{config.HttpPort}", Logger.Header.Startup);
+            _logger.Info($"Uruchomiono serwer HTTP pod adresem http://{config.HttpIp}:{config.HttpPort}", Logger.Header.Startup);
 
             _socket = new WatsonWsServer(config.SocketIp, config.SocketPort, false);
             _socket.ClientConnected += ClientConnected;
             _socket.ClientDisconnected += ClientDisconnected;
             _socket.MessageReceived += MessageReceived;
             _socket.Start();
-            _logger.Info($"Uruchomiono serwer Websocket pod adresem {config.SocketIp}:{config.SocketPort}", Logger.Header.Startup);
+            _logger.Info($"Uruchomiono serwer Websocket pod adresem ws://{config.SocketIp}:{config.SocketPort}", Logger.Header.Startup);
 
             Console.ReadLine();
         }
@@ -55,7 +55,7 @@ namespace Akips_Relay
             await ctx.Response.Send("All set!");
         }
 
-        [StaticRoute(HttpMethod.POST, "/gamedata")]
+        [StaticRoute(HttpMethod.GET, "/gamedata")]
         public static async Task PostGamedata(HttpContext ctx)
         {
             var queryParams = ctx.Request.Query.Elements;

@@ -10,41 +10,47 @@ using UnityEngine;
 
 namespace Akips
 {
-    [BepInPlugin("io.github.landuu.akips", "Akips", "0.1")]
+    [BepInPlugin("io.github.landuu.akips", "Akips", "1.0")]
     public class Plugin : BaseUnityPlugin
     {
-        private int _locker = 0;
-        //private static HttpClient _httpClient = new HttpClient();
+        private int _timeSpanInFrames = 0;
+        private static HttpClient _httpClient = new HttpClient();
+        private static string _url = @"http://localhost:8080/gamedata?map={0}&x={1}&y={2}&z={3}";
 
         private void Awake()
         {
-            // Plugin startup logic
-            Logger.LogInfo("WTF");
-
-            //_httpClient.GetAsync("http://localhost:5183/test?data=tarkovstart");
+            _httpClient.Timeout = TimeSpan.FromSeconds(1);
+            Logger.LogInfo("Akips Started! Remember to start relay server!");
         }
 
         private void Update()
         {
-            if (_locker < 200)
+            if (_timeSpanInFrames < 500)
             {
-                _locker++;
+                _timeSpanInFrames++;
                 return;
             }
-            _locker = 0;
+            _timeSpanInFrames = 0;
 
             var gameWorld = Singleton<GameWorld>.Instance;
             if (gameWorld == null)
-            {
                 return;
-            }
-            var player = gameWorld.RegisteredPlayers.Find(p => p.IsYourPlayer);
-            string location = player.Location;
-            var pos = player.Position;
 
-            string lok = $"Lokacja to {location}, pozycja {pos[0]} {pos[1]} {pos[2]}";
+            var player = gameWorld.RegisteredPlayers.Find(p => p.IsYourPlayer);
+            if (player == null)
+                return;
+
+            string location = player.Location;
+            var position = player.Position;
+            string lok = $"Lokacja to {location}, pozycja {position[0]} {position[1]} {position[2]}";
             Logger.LogInfo(lok);
-            //_httpClient.GetAsync("http://localhost:5183/test?data=" + lok);
+            SendGamedata(location, position);
+        }
+
+        private void SendGamedata(string map, Vector3 pos)
+        {
+            string reqestUrl = string.Format(_url, map, pos[0], pos[1], pos[2]);
+            _httpClient.GetAsync(reqestUrl);
         }
     }
 }
