@@ -52,7 +52,7 @@
 			}
 
 			socket.close();
-			push("/hello");
+			push("/map");
 		}, 3000)
 	}
 
